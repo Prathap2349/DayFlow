@@ -118,8 +118,8 @@ export function AdminDashboardPage() {
   return (
     <div className="space-y-6 max-w-7xl">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Good morning, HR Team 👋</h2>
-        <p className="text-slate-500 mt-1 text-sm">Here's your live workforce overview for today.</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Good morning, HR Team 👋</h2>
+        <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Here's your live workforce overview for today.</p>
       </div>
 
       {/* Stats Cards derived from Data Layer */}

@@ -100,18 +100,18 @@ export function DashboardHeader({ title, onMenuToggle, onCommandPaletteOpen }: D
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex items-center gap-3 px-4 sm:px-6 h-16 bg-white/95 backdrop-blur border-b border-slate-100">
+      <header className="sticky top-0 z-20 flex items-center gap-3 px-4 sm:px-6 h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-100 dark:border-slate-800 text-slate-900 dark:text-slate-100">
         {/* Mobile hamburger */}
         <button
           onClick={onMenuToggle}
-          className="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
           aria-label="Open navigation"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         {/* Title */}
-        <h1 className="text-lg font-semibold text-slate-900 flex-1 min-w-0 truncate">{title}</h1>
+        <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex-1 min-w-0 truncate">{title}</h1>
 
         {/* Actions */}
         <div className="flex items-center gap-2">

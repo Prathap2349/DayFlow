@@ -24,10 +24,10 @@ function getGreeting(): string {
 }
 
 const quickActions = [
-  { label: 'View Attendance', icon: CalendarCheck, to: '/employee/attendance', color: 'bg-blue-50 text-blue-600 hover:bg-blue-100' },
-  { label: 'Apply for Leave', icon: Palmtree, to: '/employee/leave', color: 'bg-amber-50 text-amber-600 hover:bg-amber-100' },
-  { label: 'View Profile', icon: User, to: '/employee/profile', color: 'bg-violet-50 text-violet-600 hover:bg-violet-100' },
-  { label: 'Notifications', icon: Bell, to: '/employee/notifications', color: 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' },
+  { label: 'View Attendance', icon: CalendarCheck, to: '/employee/attendance', color: 'bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-900/50 hover:bg-blue-100 dark:hover:bg-blue-950/60' },
+  { label: 'Apply for Leave', icon: Palmtree, to: '/employee/leave', color: 'bg-amber-50/80 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-950/60' },
+  { label: 'View Profile', icon: User, to: '/employee/profile', color: 'bg-violet-50/80 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border-violet-100 dark:border-violet-900/50 hover:bg-violet-100 dark:hover:bg-violet-950/60' },
+  { label: 'Notifications', icon: Bell, to: '/employee/notifications', color: 'bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-950/60' },
 ];
 
 export function EmployeeDashboardPage() {
@@ -95,10 +95,10 @@ export function EmployeeDashboardPage() {
       {/* Welcome */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
             {getGreeting()}, {firstName} 👋
           </h2>
-          <p className="text-slate-500 mt-1 text-sm">
+          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">
             Here's what's happening with your workday.
           </p>
         </div>
