@@ -9,7 +9,6 @@ import { DayflowLogo } from '../../components/shared/DayflowLogo';
 import type { UserRole } from '../../types/auth';
 import { clsx } from 'clsx';
 
-const IS_DEV = import.meta.env.DEV;
 
 export function LoginPage() {
   const { login, isAuthenticated, isLoading: authLoading, user } = useAuth();
@@ -192,22 +191,20 @@ export function LoginPage() {
             </Button>
           </form>
 
-          {IS_DEV && (
-            <div className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-100">
-              <p className="text-xs font-semibold text-amber-700 mb-2">🔑 Demo account credentials</p>
-              <div className="text-xs text-amber-700 space-y-1">
-                <p><strong>Email:</strong> {role === 'hr' ? 'hr@dayflow.demo' : 'employee@dayflow.demo'}</p>
-                <p><strong>Password:</strong> {role === 'hr' ? 'hr123' : 'employee123'}</p>
-              </div>
-              <button
-                type="button"
-                onClick={fillDemoCredentials}
-                className="mt-2 text-xs font-medium text-amber-700 hover:text-amber-800 underline"
-              >
-                Fill credentials →
-              </button>
+          <div className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-100">
+            <p className="text-xs font-semibold text-amber-700 mb-2">🔑 Demo account credentials</p>
+            <div className="text-xs text-amber-700 space-y-1">
+              <p><strong>Email:</strong> {role === 'hr' ? 'hr@dayflow.demo' : 'employee@dayflow.demo'}</p>
+              <p><strong>Password:</strong> {role === 'hr' ? 'hr123' : 'employee123'}</p>
             </div>
-          )}
+            <button
+              type="button"
+              onClick={fillDemoCredentials}
+              className="mt-2 text-xs font-medium text-amber-700 hover:text-amber-800 underline"
+            >
+              Fill credentials →
+            </button>
+          </div>
         </div>
       </div>
     </div>
