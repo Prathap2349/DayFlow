@@ -333,5 +333,35 @@ INSERT INTO public.employees (
     ('EMP003', 'Rahul', 'Nair', 'rahul.n@dayflow.demo', '+91 98765 43212', 'DevOps & Cloud Engineer', 'Full-time', '2022-11-10', 'Active', 55000, 22000, 16000, 6600, 4400, 82000),
     ('EMP004', 'Ananya', 'Gupta', 'hr@dayflow.demo', '+91 98765 43213', 'HR Operations Lead', 'Full-time', '2022-06-15', 'Active', 60000, 24000, 18000, 7200, 4800, 90000),
     ('EMP005', 'Vikram', 'Singh', 'vikram.s@dayflow.demo', '+91 98765 43214', 'Senior Product Manager', 'Full-time', '2023-05-20', 'On Leave', 65000, 26000, 19000, 7800, 5200, 97000)
-ON CONFLICT (employee_code) DO NOTHING;
+-- Office Locations Table for Network IP & Geofencing
+CREATE TABLE IF NOT EXISTS public.office_locations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT UNIQUE NOT NULL,
+    allowed_ip_addresses TEXT[] NOT NULL DEFAULT '{}',
+    latitude NUMERIC,
+    longitude NUMERIC,
+    radius_meters NUMERIC DEFAULT 100,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Work Mode & WFH Exception Columns
+ALTER TABLE public.employees 
+ADD COLUMN IF NOT EXISTS work_mode TEXT CHECK (work_mode IN ('Office', 'Remote', 'Hybrid')) DEFAULT 'Office',
+ADD COLUMN IF NOT EXISTS wfh_exception_active BOOLEAN DEFAULT FALSE;
+
+-- Attendance Verification Columns
+ALTER TABLE public.attendance
+ADD COLUMN IF NOT EXISTS ip_address TEXT,
+ADD COLUMN IF NOT EXISTS is_verified_location BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS verification_method TEXT CHECK (verification_method IN ('office_wifi', 'wfh_exception', 'remote_allowed', 'geo_location', 'manual_override'));
+
+ALTER TABLE public.office_locations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow read office locations" ON public.office_locations FOR SELECT USING (true);
+CREATE POLICY "Allow edit office locations by admin/hr" ON public.office_locations FOR ALL USING (public.is_admin_or_hr());
+
+-- Seed Default HQ Office Location
+INSERT INTO public.office_locations (name, allowed_ip_addresses) VALUES
+    ('HQ Main Office', ARRAY['127.0.0.1', '::1', '*'])
+ON CONFLICT (name) DO NOTHING;
+
 

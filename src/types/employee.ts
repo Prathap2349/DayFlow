@@ -37,4 +37,6 @@ export interface Employee {
   netSalary?: number;
   documents?: EmployeeDocument[];
   role: 'employee' | 'hr' | 'admin';
+  workMode?: 'Office' | 'Remote' | 'Hybrid';
+  wfhExceptionActive?: boolean;
 }

@@ -12,6 +12,9 @@ export interface AttendanceRecord {
   workingHours?: number; // float hours (e.g. 8.5)
   status: AttendanceStatus;
   notes?: string;
+  ipAddress?: string;
+  isVerifiedLocation?: boolean;
+  verificationMethod?: 'office_wifi' | 'wfh_exception' | 'remote_allowed' | 'geo_location' | 'manual_override';
 }
 
 export interface AttendanceSummary {

@@ -228,6 +228,17 @@ export function AdminEmployeesPage() {
     }
   };
 
+  const handleToggleWfhException = async (emp: Employee) => {
+    try {
+      const nextState = !emp.wfhExceptionActive;
+      await employeeService.updateWorkMode(emp.id, emp.workMode || 'Office', nextState);
+      setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, wfhExceptionActive: nextState } : e));
+      toast.success(`WFH Exception for ${emp.name} set to ${nextState ? 'ACTIVE' : 'INACTIVE'}`);
+    } catch (err) {
+      toast.error('Failed to update WFH exception');
+    }
+  };
+
   // --- CSV FILE IMPORT IMPLEMENTATION ---
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -463,7 +474,7 @@ export function AdminEmployeesPage() {
                 <th className="text-left px-4 py-3">Employee</th>
                 <th className="text-left px-3 py-3">Emp ID</th>
                 <th className="text-left px-3 py-3 hidden sm:table-cell">Department</th>
-                <th className="text-left px-3 py-3 hidden md:table-cell">Job Title</th>
+                <th className="text-left px-3 py-3 hidden md:table-cell">Work Mode / Exception</th>
                 <th className="text-left px-3 py-3">Status</th>
                 <th className="text-left px-3 py-3 hidden lg:table-cell">Joining Date</th>
                 <th className="text-right px-4 py-3">Actions</th>
@@ -494,11 +505,36 @@ export function AdminEmployeesPage() {
                     </td>
                     <td className="px-3 py-3 font-mono text-slate-600 font-medium">{emp.employeeId}</td>
                     <td className="px-3 py-3 hidden sm:table-cell text-slate-700">{emp.department}</td>
-                    <td className="px-3 py-3 hidden md:table-cell text-slate-600">{emp.jobTitle}</td>
+                    <td className="px-3 py-3 hidden md:table-cell">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`px-2 py-0.5 rounded-md text-[11px] font-semibold ${
+                          emp.workMode === 'Remote' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
+                          emp.workMode === 'Hybrid' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                          'bg-slate-100 text-slate-700 border border-slate-200'
+                        }`}>
+                          {emp.workMode || 'Office'}
+                        </span>
+                        {emp.wfhExceptionActive && (
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                            WFH Exception
+                          </span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-3 py-3"><StatusBadge status={emp.status} /></td>
-                    <td className="px-3 py-3 hidden lg:table-cell text-slate-500">{emp.joinDate}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => handleToggleWfhException(emp)}
+                          title={emp.wfhExceptionActive ? 'Revoke WFH Exception' : 'Grant WFH Exception'}
+                          className={`px-2 py-1 rounded text-[10px] font-bold transition-colors ${
+                            emp.wfhExceptionActive
+                              ? 'bg-amber-500 text-white hover:bg-amber-600'
+                              : 'bg-slate-100 text-slate-600 hover:bg-amber-100 hover:text-amber-700'
+                          }`}
+                        >
+                          {emp.wfhExceptionActive ? 'WFH Active' : '+ WFH Exemption'}
+                        </button>
                         <button
                           onClick={() => { setSelectedEmployee(emp); setViewDetailModalOpen(true); }}
                           title="View Details"

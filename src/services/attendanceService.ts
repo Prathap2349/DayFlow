@@ -2,6 +2,7 @@
 import { supabase } from '../db/supabaseClient';
 import type { AttendanceRecord, AttendanceSummary } from '../types/attendance';
 import type { Employee } from '../types/employee';
+import { officeService } from './officeService';
 
 export const attendanceService = {
   async getTodayRecord(employeeId: string): Promise<AttendanceRecord | null> {
@@ -99,7 +100,7 @@ export const attendanceService = {
 
     const { data: emp, error: empErr } = await supabase
       .from('employees')
-      .select('id, first_name, last_name, department_id')
+      .select('id, first_name, last_name, department_id, work_mode, wfh_exception_active')
       .or(`id.eq.${employee.id},employee_code.eq.${employee.employeeId}`)
       .maybeSingle();
 
@@ -111,6 +112,27 @@ export const attendanceService = {
       throw new Error('You have already checked in for today.');
     }
 
+    // IP Validation & Work Mode Verification
+    const currentIp = await officeService.getClientIp();
+    const offices = await officeService.getOfficeLocations();
+    const allowedIps = offices.flatMap(o => o.allowedIpAddresses);
+
+    let isVerified = false;
+    let verificationMethod: 'office_wifi' | 'wfh_exception' | 'remote_allowed' | 'manual_override' = 'office_wifi';
+
+    if (emp.work_mode === 'Remote') {
+      isVerified = true;
+      verificationMethod = 'remote_allowed';
+    } else if (emp.wfh_exception_active) {
+      isVerified = true;
+      verificationMethod = 'wfh_exception';
+    } else if (allowedIps.includes('*') || allowedIps.includes('127.0.0.1') || allowedIps.includes(currentIp)) {
+      isVerified = true;
+      verificationMethod = 'office_wifi';
+    } else {
+      throw new Error(`Location Check-in Rejected: You are connected from IP (${currentIp}), which is not an approved Office Wi-Fi network. Please connect to Office Wi-Fi or request a WFH Exception from HR.`);
+    }
+
     const { data, error } = await supabase
       .from('attendance')
       .insert({
@@ -118,7 +140,10 @@ export const attendanceService = {
         attendance_date: today,
         check_in: checkInTime,
         status: 'present',
-        notes: 'Checked in via web portal',
+        notes: `Checked in via ${verificationMethod} (${currentIp})`,
+        ip_address: currentIp,
+        is_verified_location: isVerified,
+        verification_method: verificationMethod,
       })
       .select()
       .single();
@@ -216,6 +241,9 @@ export const attendanceService = {
       workingHours: r.working_minutes ? Math.round((r.working_minutes / 60) * 10) / 10 : undefined,
       status: this.mapDbStatus(r.status),
       notes: r.notes || '',
+      ipAddress: r.ip_address || undefined,
+      isVerifiedLocation: r.is_verified_location ?? true,
+      verificationMethod: r.verification_method || 'office_wifi',
     };
   },
 

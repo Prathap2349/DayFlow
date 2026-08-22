@@ -122,6 +122,8 @@ export const employeeService = {
       deductions: Number(db.pf_deduction || 0) + Number(db.tax_deduction || 0) + Number(db.other_deductions || 0),
       netSalary: Number(db.net_salary || 0),
       role: 'employee',
+      workMode: db.work_mode || 'Office',
+      wfhExceptionActive: db.wfh_exception_active ?? false,
     };
   },
 
@@ -142,6 +144,9 @@ export const employeeService = {
     if (emp.employmentType !== undefined) result.employment_type = emp.employmentType;
     if (emp.status !== undefined) result.employment_status = emp.status;
 
+    if (emp.workMode !== undefined) result.work_mode = emp.workMode;
+    if (emp.wfhExceptionActive !== undefined) result.wfh_exception_active = emp.wfhExceptionActive;
+
     if (emp.basicSalary !== undefined) result.basic_salary = emp.basicSalary;
     if (emp.allowances !== undefined) {
       result.hra = Math.round(emp.basicSalary ? emp.basicSalary * 0.4 : emp.allowances * 0.4);
@@ -153,5 +158,13 @@ export const employeeService = {
     }
     if (emp.netSalary !== undefined) result.net_salary = emp.netSalary;
     return result;
+  },
+
+  async updateWorkMode(employeeId: string, workMode: 'Office' | 'Remote' | 'Hybrid', wfhExceptionActive: boolean): Promise<void> {
+    const { error } = await supabase
+      .from('employees')
+      .update({ work_mode: workMode, wfh_exception_active: wfhExceptionActive })
+      .or(`id.eq.${employeeId},employee_code.eq.${employeeId}`);
+    if (error) throw new Error(error.message);
   },
 };

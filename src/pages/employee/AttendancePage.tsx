@@ -1,6 +1,6 @@
 // src/pages/employee/AttendancePage.tsx
 import { useState, useEffect } from 'react';
-import { CalendarCheck, Clock, CheckCircle2, AlertCircle, Calendar } from 'lucide-react';
+import { CalendarCheck, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Card, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { StatusBadge } from '../../components/ui/Badge';
@@ -170,29 +170,36 @@ export function EmployeeAttendancePage() {
                 <th className="text-left px-5 py-3">Date</th>
                 <th className="text-left px-4 py-3">Check In</th>
                 <th className="text-left px-4 py-3">Check Out</th>
-                <th className="text-left px-4 py-3">Working Hours</th>
+                <th className="text-left px-4 py-3">Hours</th>
                 <th className="text-left px-4 py-3">Status</th>
+                <th className="text-left px-4 py-3">Verification</th>
                 <th className="text-left px-4 py-3">Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {history.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-400">No attendance logs available.</td>
+                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">No attendance history records found.</td>
                 </tr>
               ) : (
-                history.map(item => (
-                  <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-5 py-3.5 font-medium text-slate-900 flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" /> {item.date}
+                history.map(rec => (
+                  <tr key={rec.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="px-5 py-3 font-semibold text-slate-900">{rec.date}</td>
+                    <td className="px-4 py-3 text-slate-600 font-mono">{rec.checkInTime || '—'}</td>
+                    <td className="px-4 py-3 text-slate-600 font-mono">{rec.checkOutTime || '—'}</td>
+                    <td className="px-4 py-3 text-slate-700 font-medium">{rec.workingHours ? `${rec.workingHours} hrs` : '—'}</td>
+                    <td className="px-4 py-3"><StatusBadge status={rec.status} /></td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        rec.verificationMethod === 'wfh_exception' ? 'bg-amber-100 text-amber-800 border border-amber-300' :
+                        rec.verificationMethod === 'remote_allowed' ? 'bg-purple-100 text-purple-800 border border-purple-300' :
+                        'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                      }`}>
+                        {rec.verificationMethod === 'wfh_exception' ? 'WFH Exception' :
+                         rec.verificationMethod === 'remote_allowed' ? 'Remote' : 'Office Wi-Fi'}
+                      </span>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-700">{item.checkInTime || '—'}</td>
-                    <td className="px-4 py-3.5 text-slate-700">{item.checkOutTime || '—'}</td>
-                    <td className="px-4 py-3.5 font-semibold text-slate-800">
-                      {item.workingHours ? `${item.workingHours} hrs` : '—'}
-                    </td>
-                    <td className="px-4 py-3.5"><StatusBadge status={item.status} /></td>
-                    <td className="px-4 py-3.5 text-slate-500">{item.notes || 'Normal workday'}</td>
+                    <td className="px-4 py-3 text-slate-400 text-[11px] truncate max-w-xs">{rec.notes || '—'}</td>
                   </tr>
                 ))
               )}

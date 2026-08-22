@@ -2,6 +2,7 @@
 import { supabase } from '../db/supabaseClient';
 import type { LeaveRequest, LeaveType } from '../types/leave';
 import { notificationService } from './notificationService';
+import { emailService } from './emailService';
 
 export const leaveService = {
   async getLeaveRequests(employeeId?: string): Promise<LeaveRequest[]> {
@@ -113,7 +114,7 @@ export const leaveService = {
       link: '/admin/leave',
     }).catch(e => console.warn('Could not add notification', e));
 
-    return {
+    const result: LeaveRequest = {
       id: created.id,
       employeeId: data.employeeId,
       employeeName: data.employeeName,
@@ -126,6 +127,11 @@ export const leaveService = {
       status: 'Pending',
       appliedOn: new Date().toISOString().split('T')[0],
     };
+
+    // Trigger notification and automated email for HR
+    emailService.notifyHrNewLeaveRequest(data.employeeName, result).catch(e => console.warn('Could not dispatch HR email', e));
+
+    return result;
   },
 
   async approveLeave(requestId: string, _reviewerName: string): Promise<LeaveRequest> {
@@ -168,6 +174,25 @@ export const leaveService = {
       .from('employees')
       .update({ leave_balance: newBalance })
       .eq('id', currentReq.employee_id);
+
+    const empName = `${currentReq.employees?.first_name || ''} ${currentReq.employees?.last_name || ''}`.trim() || 'Employee';
+    const approvedResult: LeaveRequest = {
+      id: updated.id,
+      employeeId: currentReq.employees?.employee_code || '',
+      employeeName: empName,
+      department: currentReq.employees?.department_id || 'Operations',
+      leaveType: this.mapDbLeaveType(updated.leave_type),
+      startDate: updated.start_date,
+      endDate: updated.end_date,
+      days: Number(updated.number_of_days),
+      reason: updated.reason,
+      status: 'Approved',
+      appliedOn: updated.submitted_at ? new Date(updated.submitted_at).toISOString().split('T')[0] : '',
+    };
+
+    if (currentReq.employees?.email) {
+      emailService.notifyEmployeeLeaveStatus(currentReq.employees.email, empName, approvedResult, 'Approved').catch(e => console.warn('Could not dispatch email', e));
+    }
 
     return {
       id: updated.id,

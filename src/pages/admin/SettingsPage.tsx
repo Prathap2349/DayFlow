@@ -1,22 +1,59 @@
 // src/pages/admin/SettingsPage.tsx
 import { useState, useEffect } from 'react';
-import { Save } from 'lucide-react';
+import { Save, Wifi, Plus, Trash2, Globe } from 'lucide-react';
 import { Card, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { settingsService } from '../../services/settingsService';
+import { officeService, type OfficeLocation } from '../../services/officeService';
 import type { UserSettings, CompanySettings } from '../../types/settings';
 import toast from 'react-hot-toast';
 
 export function AdminSettingsPage() {
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [companySettings, setCompanySettings] = useState<CompanySettings | null>(null);
-  const [activeTab, setActiveTab] = useState<'General' | 'Notifications' | 'Security'>('General');
+  const [officeLocations, setOfficeLocations] = useState<OfficeLocation[]>([]);
+  const [myCurrentIp, setMyCurrentIp] = useState<string>('Detecting...');
+  const [newOfficeName, setNewOfficeName] = useState('');
+  const [newOfficeIp, setNewOfficeIp] = useState('');
+  const [activeTab, setActiveTab] = useState<'General' | 'Network' | 'Notifications' | 'Security'>('General');
 
   useEffect(() => {
     settingsService.getUserSettings().then(setUserSettings);
     settingsService.getCompanySettings().then(setCompanySettings);
+    officeService.getOfficeLocations().then(setOfficeLocations);
+    officeService.getClientIp().then(setMyCurrentIp);
   }, []);
+
+  const handleAddOfficeIp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newOfficeName.trim() || !newOfficeIp.trim()) {
+      toast.error('Please enter both office name and allowed IP.');
+      return;
+    }
+    try {
+      const saved = await officeService.saveOfficeLocation({
+        name: newOfficeName.trim(),
+        allowedIpAddresses: newOfficeIp.split(',').map(ip => ip.trim()),
+      });
+      setOfficeLocations(prev => [...prev.filter(o => o.id !== saved.id), saved]);
+      setNewOfficeName('');
+      setNewOfficeIp('');
+      toast.success('Office network rule saved!');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save rule');
+    }
+  };
+
+  const handleDeleteOffice = async (id: string) => {
+    try {
+      await officeService.deleteOfficeLocation(id);
+      setOfficeLocations(prev => prev.filter(o => o.id !== id));
+      toast.success('Office network rule deleted');
+    } catch (err) {
+      toast.error('Failed to delete office location');
+    }
+  };
 
   const handleSaveCompany = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +81,7 @@ export function AdminSettingsPage() {
       </div>
 
       <div className="flex border-b border-slate-200 text-xs font-semibold gap-6">
-        {(['General', 'Notifications', 'Security'] as const).map(tab => (
+        {(['General', 'Network', 'Notifications', 'Security'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -54,10 +91,93 @@ export function AdminSettingsPage() {
                 : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            {tab} Settings
+            {tab === 'Network' ? 'Office Wi-Fi & IPs' : `${tab} Settings`}
           </button>
         ))}
       </div>
+
+      {activeTab === 'Network' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader
+              title="Office Wi-Fi & Approved IP Addresses"
+              subtitle="Employees on 'Office' mode must be connected to these public IP addresses to punch in."
+            />
+            <div className="mt-4 p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl flex items-center justify-between text-xs text-indigo-900">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-indigo-600 shrink-0" />
+                <span>Your Current Public Network IP Address: <strong className="font-mono text-indigo-700">{myCurrentIp}</strong></span>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setNewOfficeName('Current Device Network');
+                  setNewOfficeIp(myCurrentIp);
+                }}
+              >
+                Use My Current IP
+              </Button>
+            </div>
+
+            <form onSubmit={handleAddOfficeIp} className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <Input
+                label="Office Location Name"
+                placeholder="e.g. HQ Main Office"
+                value={newOfficeName}
+                onChange={e => setNewOfficeName(e.target.value)}
+              />
+              <Input
+                label="Allowed Public IP (or * for all)"
+                placeholder="e.g. 103.21.12.44 or *"
+                value={newOfficeIp}
+                onChange={e => setNewOfficeIp(e.target.value)}
+              />
+              <div className="flex items-end">
+                <Button type="submit" fullWidth leftIcon={<Plus className="w-4 h-4" />}>
+                  Add Approved IP Rule
+                </Button>
+              </div>
+            </form>
+
+            <div className="mt-6 space-y-3">
+              <h4 className="font-semibold text-xs text-slate-800">Configured Office Networks:</h4>
+              {officeLocations.length === 0 ? (
+                <p className="text-xs text-slate-400">No office IP rules added yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {officeLocations.map(loc => (
+                    <div
+                      key={loc.id}
+                      className="flex items-center justify-between p-3 border border-slate-200 rounded-xl text-xs bg-slate-50/50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                          <Wifi className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-900">{loc.name}</p>
+                          <p className="font-mono text-[11px] text-slate-500">
+                            Allowed IPs: {loc.allowedIpAddresses.join(', ') || 'All (*)'}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDeleteOffice(loc.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
 
       {activeTab === 'General' && (
         <Card>
