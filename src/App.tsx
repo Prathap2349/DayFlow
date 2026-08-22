@@ -31,7 +31,7 @@ import { AdminSettingsPage } from './pages/admin/SettingsPage';
 
 // Config Check & DB Health
 import { isSupabaseConfigured } from './db/supabaseClient';
-import { checkDatabaseHealth, DbHealthStatus } from './db/dbHealth';
+import { checkDatabaseHealth, type DbHealthStatus } from './db/dbHealth';
 import { AlertCircle, Database, HelpCircle, Check, Copy, Terminal, ExternalLink, RefreshCw } from 'lucide-react';
 import { Button } from './components/ui/Button';
 import toast from 'react-hot-toast';

@@ -1,5 +1,5 @@
 // src/components/shared/ErrorBoundary.tsx
-import React, { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Database } from 'lucide-react';
 import { Button } from '../ui/Button';
 
