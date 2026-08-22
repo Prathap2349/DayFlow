@@ -1,11 +1,10 @@
 // src/components/header/DashboardHeader.tsx
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, Search, Bell, User as UserIcon, Settings, LogOut, Check, X, Building, Mail, Sun, Moon } from 'lucide-react';
+import { Menu, Search, Bell, User as UserIcon, Settings, LogOut, Check, X, Building, Mail } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { Badge } from '../ui/Badge';
 import { useAuth } from '../../auth/useAuth';
-import { useTheme } from '../../context/ThemeContext';
 import { notificationService } from '../../services/notificationService';
 import { employeeService } from '../../services/employeeService';
 import type { NotificationItem } from '../../types/notification';
@@ -20,7 +19,6 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ title, onMenuToggle, onCommandPaletteOpen }: DashboardHeaderProps) {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   // Dropdown states
@@ -100,42 +98,29 @@ export function DashboardHeader({ title, onMenuToggle, onCommandPaletteOpen }: D
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex items-center gap-3 px-4 sm:px-6 h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-100 dark:border-slate-800 text-slate-900 dark:text-slate-100">
+      <header className="sticky top-0 z-20 flex items-center gap-3 px-4 sm:px-6 h-16 bg-white/95 backdrop-blur border-b border-slate-100 text-slate-900">
         {/* Mobile hamburger */}
         <button
           onClick={onMenuToggle}
-          className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
           aria-label="Open navigation"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         {/* Title */}
-        <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex-1 min-w-0 truncate">{title}</h1>
+        <h1 className="text-lg font-semibold text-slate-900 flex-1 min-w-0 truncate">{title}</h1>
 
         {/* Actions */}
         <div className="flex items-center gap-2">
           {/* Global Search / Command Palette Button */}
           <button
             onClick={() => onCommandPaletteOpen ? onCommandPaletteOpen() : setSearchOpen(true)}
-            className="flex items-center gap-2 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 text-sm transition-all shadow-sm focus-visible:outline-none"
+            className="flex items-center gap-2 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-500 text-sm transition-all shadow-sm focus-visible:outline-none"
             aria-label="Global Search"
           >
-            <Search className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span className="hidden sm:inline text-xs font-medium text-slate-500 dark:text-slate-400">Search (Ctrl+K)</span>
-          </button>
-
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all shadow-sm"
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400" />
-            ) : (
-              <Moon className="w-4 h-4 text-indigo-600" />
-            )}
+            <Search className="w-4 h-4 text-indigo-600" />
+            <span className="hidden sm:inline text-xs font-medium text-slate-500">Search (Ctrl+K)</span>
           </button>
 
           {/* Notifications Bell Dropdown */}
