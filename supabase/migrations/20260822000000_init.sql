@@ -283,6 +283,7 @@ RETURNS TRIGGER SECURITY DEFINER AS $$
 DECLARE
     role_var TEXT := 'employee';
     emp_id_var UUID := NULL;
+    dept_name TEXT := NULL;
 BEGIN
     -- Set role based on email context
     IF NEW.email = 'hr@dayflow.demo' THEN
@@ -292,7 +293,15 @@ BEGIN
     END IF;
 
     -- Look up if this email is already registered in our employees table
-    SELECT id INTO emp_id_var FROM public.employees WHERE email = NEW.email;
+    SELECT e.id, d.name INTO emp_id_var, dept_name 
+    FROM public.employees e
+    LEFT JOIN public.departments d ON d.id = e.department_id
+    WHERE e.email = NEW.email;
+
+    -- If they are in the Human Resources department, upgrade them to HR role
+    IF dept_name = 'Human Resources' THEN
+        role_var := 'hr';
+    END IF;
 
     INSERT INTO public.profiles (id, employee_id, full_name, email, role)
     VALUES (
@@ -381,6 +390,11 @@ INSERT INTO public.announcements (title, content, category, is_pinned, author_na
     ('Updated Remote Work & Wi-Fi Check-in Policy', 'Please ensure you are connected to an approved Office Wi-Fi network when punching in for office days. Contact HR for WFH exception overrides.', 'Policy', true, 'Ananya Gupta (HR Lead)'),
     ('Q3 Wellness Allowance Claim Submission Deadline', 'Friendly reminder to submit your fitness and wellness expense claims before the end of the month to receive reimbursement in this payroll cycle.', 'General', false, 'Finance Team')
 ON CONFLICT DO NOTHING;
+
+-- Seed Default HQ Office Location for network geofencing testing
+INSERT INTO public.office_locations (name, allowed_ip_addresses, latitude, longitude, radius_meters) VALUES
+    ('Dayflow HQ Bengaluru', ARRAY['127.0.0.1', '::1', '*'], 12.9716, 77.5946, 100)
+ON CONFLICT (name) DO NOTHING;
 
 
 
