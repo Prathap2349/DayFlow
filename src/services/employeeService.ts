@@ -27,7 +27,7 @@ export const employeeService = {
       const { data, error } = await supabase
         .from('employees')
         .select('*, departments(*)')
-        .or(`id.eq.${idOrCode},employee_code.eq.${idOrCode}`)
+        .or(`id.eq.${idOrCode},employee_code.eq.${idOrCode},email.eq.${idOrCode}`)
         .maybeSingle();
 
       if (error) {
