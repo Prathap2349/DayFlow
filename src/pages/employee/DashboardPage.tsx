@@ -13,6 +13,8 @@ import type { LeaveRequest } from '../../types/leave';
 import { clsx } from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { badgeService } from '../../services/badgeService';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -149,28 +151,73 @@ export function EmployeeDashboardPage() {
         />
       </div>
 
+      {/* Gamification Badges Banner */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50 via-violet-50 to-amber-50 dark:from-indigo-950/40 dark:to-amber-950/20 border border-indigo-100/80 dark:border-indigo-900/40">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-bold text-indigo-950 dark:text-indigo-200 uppercase tracking-wider flex items-center gap-1.5">
+            🏆 Workplace Streaks & Achievements
+          </h3>
+          <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold cursor-pointer hover:underline" onClick={() => navigate('/employee/profile')}>
+            View All Badges →
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {badgeService.getEmployeeBadges(empId).map(b => (
+            <div key={b.id} className={`p-3 rounded-xl border ${b.colorBg} flex items-center gap-3 transition-transform hover:-translate-y-0.5`}>
+              <span className="text-2xl">{b.icon}</span>
+              <div>
+                <p className={`text-xs font-bold ${b.colorText}`}>{b.title}</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">{b.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick Actions */}
-        <div className="lg:col-span-1">
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {quickActions.map(({ label, icon: Icon, to, color }) => (
-              <button
-                key={to}
-                onClick={() => navigate(to)}
-                className={clsx(
-                  'flex flex-col items-center gap-3 p-4 rounded-xl border border-transparent',
-                  'transition-all duration-150 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
-                  color
-                )}
-              >
-                <div className="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center shadow-sm">
-                  <Icon style={{ width: 20, height: 20 }} />
-                </div>
-                <span className="text-xs font-medium text-center leading-tight">{label}</span>
-              </button>
-            ))}
+        {/* Quick Actions & Working Hours Chart */}
+        <div className="lg:col-span-1 space-y-6">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Quick Actions</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {quickActions.map(({ label, icon: Icon, to, color }) => (
+                <button
+                  key={to}
+                  onClick={() => navigate(to)}
+                  className={clsx(
+                    'flex flex-col items-center gap-3 p-4 rounded-xl border border-transparent',
+                    'transition-all duration-150 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+                    color
+                  )}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center shadow-sm">
+                    <Icon style={{ width: 20, height: 20 }} />
+                  </div>
+                  <span className="text-xs font-medium text-center leading-tight">{label}</span>
+                </button>
+              ))}
+            </div>
           </div>
+
+          <Card padding="md">
+            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-3">Weekly Hours Logged</h4>
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[
+                  { day: 'M', hours: 8.5 },
+                  { day: 'T', hours: 9.0 },
+                  { day: 'W', hours: 8.0 },
+                  { day: 'T', hours: 8.8 },
+                  { day: 'F', hours: 7.5 },
+                ]}>
+                  <XAxis dataKey="day" stroke="#94a3b8" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} domain={[0, 10]} />
+                  <Tooltip contentStyle={{ borderRadius: 8, fontSize: 11 }} />
+                  <Bar dataKey="hours" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
         </div>
 
         {/* My Leave Requests */}

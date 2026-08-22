@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './auth/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { EmployeeLayout } from './layouts/EmployeeLayout';
 import { AdminLayout } from './layouts/AdminLayout';
@@ -197,7 +198,8 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
         <BrowserRouter>
           <Routes>
             {/* Public Login Route */}
@@ -246,30 +248,31 @@ export default function App() {
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
-        </BrowserRouter>
 
-        {/* Global Toast Notifications */}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 3500,
-            style: {
-              background: '#fff',
-              color: '#0f172a',
-              borderRadius: '10px',
-              border: '1px solid #e2e8f0',
-              fontSize: '14px',
-              boxShadow: '0 4px 24px -4px rgba(0,0,0,0.12)',
-            },
-            success: {
-              iconTheme: { primary: '#10b981', secondary: '#fff' },
-            },
-            error: {
-              iconTheme: { primary: '#f43f5e', secondary: '#fff' },
-            },
-          }}
-        />
+          {/* Global Toast Notifications */}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3500,
+              style: {
+                background: '#fff',
+                color: '#0f172a',
+                borderRadius: '10px',
+                border: '1px solid #e2e8f0',
+                fontSize: '14px',
+                boxShadow: '0 4px 24px -4px rgba(0,0,0,0.12)',
+              },
+              success: {
+                iconTheme: { primary: '#10b981', secondary: '#fff' },
+              },
+              error: {
+                iconTheme: { primary: '#f43f5e', secondary: '#fff' },
+              },
+            }}
+          />
+        </BrowserRouter>
       </AuthProvider>
-    </ErrorBoundary>
-  );
+    </ThemeProvider>
+  </ErrorBoundary>
+);
 }

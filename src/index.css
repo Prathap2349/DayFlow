@@ -40,6 +40,43 @@ body {
   background-color: var(--color-surface);
   color: var(--color-text-primary);
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
+  background-color: #090d16;
+  color: #f1f5f9;
+}
+
+html.dark .glass-card,
+html.dark .bg-white {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  border-color: rgba(51, 65, 85, 0.6) !important;
+  color: #f8fafc !important;
+}
+
+html.dark aside,
+html.dark header {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+
+html.dark .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-800 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .bg-slate-50 {
+  background-color: #1e293b !important;
 }
 
 #root {

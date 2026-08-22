@@ -1,6 +1,6 @@
 // src/pages/employee/ProfilePage.tsx
 import { useState, useEffect } from 'react';
-import { User, Building, DollarSign, FileText, Phone, Mail, MapPin, Edit3, Save } from 'lucide-react';
+import { User, Building, DollarSign, FileText, Phone, Mail, MapPin, Edit3, Save, Award } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -8,6 +8,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Avatar } from '../../components/ui/Avatar';
 import { useAuth } from '../../auth/useAuth';
 import { employeeService } from '../../services/employeeService';
+import { badgeService } from '../../services/badgeService';
 import type { Employee } from '../../types/employee';
 import toast from 'react-hot-toast';
 
@@ -240,6 +241,29 @@ export function EmployeeProfilePage() {
               </li>
             ))}
           </ul>
+        </Card>
+
+        {/* Achievement Badges Card */}
+        <Card>
+          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+            <Award className="w-4 h-4 text-amber-500" />
+            <h3 className="text-sm font-semibold text-slate-900">Workplace Achievement Badges</h3>
+          </div>
+
+          <div className="space-y-3 text-xs">
+            {badgeService.getEmployeeBadges(profile.id).map(b => (
+              <div key={b.id} className={`p-3 rounded-xl border ${b.colorBg} flex items-center justify-between`}>
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">{b.icon}</span>
+                  <div>
+                    <p className={`font-bold ${b.colorText}`}>{b.title}</p>
+                    <p className="text-[10px] text-slate-500 leading-tight mt-0.5">{b.description}</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-semibold text-slate-400 shrink-0 ml-2">{b.unlockedAt}</span>
+              </div>
+            ))}
+          </div>
         </Card>
       </div>
     </div>

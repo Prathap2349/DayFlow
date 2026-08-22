@@ -17,7 +17,7 @@ import type { Employee } from '../../types/employee';
 import type { LeaveRequest } from '../../types/leave';
 import type { AttendanceSummary } from '../../types/attendance';
 import toast from 'react-hot-toast';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -221,12 +221,12 @@ export function AdminDashboardPage() {
           )}
         </Card>
 
-        {/* Attendance Donut Chart */}
+        {/* Attendance Donut & Weekly Trend Chart */}
         <Card>
           <CardHeader title="Today's Attendance Ratio" subtitle={`${attSummary.total || 132} total workforce`} />
-          <ResponsiveContainer width="100%" height={180}>
+          <ResponsiveContainer width="100%" height={140}>
             <PieChart>
-              <Pie data={chartData} cx="50%" cy="50%" innerRadius={50} outerRadius={78} paddingAngle={3} dataKey="value">
+              <Pie data={chartData} cx="50%" cy="50%" innerRadius={40} outerRadius={65} paddingAngle={3} dataKey="value">
                 {chartData.map((entry, i) => (
                   <Cell key={i} fill={entry.color} />
                 ))}
@@ -234,16 +234,30 @@ export function AdminDashboardPage() {
               <Tooltip formatter={(val) => [val, '']} contentStyle={{ borderRadius: 8, fontSize: 12 }} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="space-y-2 mt-2 text-xs">
-            {chartData.map(d => (
-              <div key={d.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-                  <span className="text-slate-600">{d.name}</span>
-                </div>
-                <span className="font-semibold text-slate-800">{d.value}</span>
-              </div>
-            ))}
+
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-2">
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Weekly Attendance Trend</p>
+            <div className="h-24">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={[
+                  { day: 'Mon', present: 128 },
+                  { day: 'Tue', present: 130 },
+                  { day: 'Wed', present: 125 },
+                  { day: 'Thu', present: 129 },
+                  { day: 'Fri', present: 122 },
+                ]}>
+                  <defs>
+                    <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="day" stroke="#94a3b8" fontSize={10} />
+                  <Tooltip contentStyle={{ borderRadius: 8, fontSize: 11 }} />
+                  <Area type="monotone" dataKey="present" stroke="#6366f1" fillOpacity={1} fill="url(#colorPresent)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </Card>
       </div>
