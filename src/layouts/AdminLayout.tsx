@@ -10,6 +10,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/attendance': 'Attendance',
   '/admin/leave': 'Leave Approvals',
   '/admin/payroll': 'Payroll',
+  '/admin/announcements': 'Announcements',
   '/admin/reports': 'Reports',
   '/admin/notifications': 'Notifications',
   '/admin/settings': 'Settings',

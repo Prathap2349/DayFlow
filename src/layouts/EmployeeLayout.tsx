@@ -10,6 +10,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/employee/profile': 'My Profile',
   '/employee/attendance': 'Attendance',
   '/employee/leave': 'Leave Requests',
+  '/employee/announcements': 'Announcements',
   '/employee/notifications': 'Notifications',
 };
 

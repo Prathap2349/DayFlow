@@ -24,9 +24,9 @@ export function Card({ children, className, padding = 'md', hover = false, onCli
       onClick={onClick}
       onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick() : undefined}
       className={clsx(
-        'bg-white rounded-xl border border-slate-100 shadow-sm',
+        'bg-white/90 backdrop-blur-md rounded-2xl border border-slate-100/80 shadow-sm shadow-slate-100',
         paddings[padding],
-        hover && 'hover:shadow-md hover:border-slate-200 transition-all duration-200 cursor-pointer',
+        hover && 'hover-lift hover:shadow-md hover:border-indigo-100 transition-all duration-200 cursor-pointer',
         onClick && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
         className
       )}

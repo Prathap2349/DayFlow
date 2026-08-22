@@ -18,6 +18,7 @@ import { EmployeeAttendancePage } from './pages/employee/AttendancePage';
 import { EmployeeLeavePage } from './pages/employee/LeavePage';
 import { EmployeePayrollPage } from './pages/employee/PayrollPage';
 import { EmployeeNotificationsPage } from './pages/employee/NotificationsPage';
+import { EmployeeAnnouncementsPage } from './pages/employee/AnnouncementsPage';
 
 // Admin Module Pages
 import { AdminDashboardPage } from './pages/admin/DashboardPage';
@@ -27,6 +28,7 @@ import { AdminLeaveApprovalPage } from './pages/admin/LeaveApprovalPage';
 import { AdminPayrollPage } from './pages/admin/PayrollPage';
 import { AdminReportsPage } from './pages/admin/ReportsPage';
 import { AdminNotificationsPage } from './pages/admin/NotificationsPage';
+import { AdminAnnouncementsPage } from './pages/admin/AnnouncementsPage';
 import { AdminSettingsPage } from './pages/admin/SettingsPage';
 
 // Config Check & DB Health
@@ -216,6 +218,7 @@ export default function App() {
               <Route path="attendance" element={<EmployeeAttendancePage />} />
               <Route path="leave" element={<EmployeeLeavePage />} />
               <Route path="payroll" element={<EmployeePayrollPage />} />
+              <Route path="announcements" element={<EmployeeAnnouncementsPage />} />
               <Route path="notifications" element={<EmployeeNotificationsPage />} />
             </Route>
 
@@ -234,6 +237,7 @@ export default function App() {
               <Route path="attendance" element={<AdminAttendancePage />} />
               <Route path="leave" element={<AdminLeaveApprovalPage />} />
               <Route path="payroll" element={<AdminPayrollPage />} />
+              <Route path="announcements" element={<AdminAnnouncementsPage />} />
               <Route path="reports" element={<AdminReportsPage />} />
               <Route path="notifications" element={<AdminNotificationsPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />

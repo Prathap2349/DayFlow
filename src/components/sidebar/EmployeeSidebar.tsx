@@ -6,6 +6,7 @@ import {
   CalendarCheck,
   ClipboardList,
   DollarSign,
+  Megaphone,
   Bell,
   LogOut,
   X,
@@ -22,6 +23,7 @@ const navItems = [
   { to: '/employee/attendance', icon: CalendarCheck, label: 'Attendance' },
   { to: '/employee/leave', icon: ClipboardList, label: 'Leave Requests' },
   { to: '/employee/payroll', icon: DollarSign, label: 'Payroll & Slips' },
+  { to: '/employee/announcements', icon: Megaphone, label: 'Announcements' },
   { to: '/employee/notifications', icon: Bell, label: 'Notifications' },
 ];
 

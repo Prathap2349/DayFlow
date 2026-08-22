@@ -7,6 +7,7 @@ import {
   ClipboardList,
   DollarSign,
   BarChart3,
+  Megaphone,
   Bell,
   Settings,
   LogOut,
@@ -24,6 +25,7 @@ const navItems = [
   { to: '/admin/attendance', icon: CalendarCheck, label: 'Attendance' },
   { to: '/admin/leave', icon: ClipboardList, label: 'Leave Approvals' },
   { to: '/admin/payroll', icon: DollarSign, label: 'Payroll' },
+  { to: '/admin/announcements', icon: Megaphone, label: 'Announcements' },
   { to: '/admin/reports', icon: BarChart3, label: 'Reports' },
   { to: '/admin/notifications', icon: Bell, label: 'Notifications' },
 ];

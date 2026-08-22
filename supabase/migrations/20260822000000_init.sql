@@ -359,9 +359,28 @@ ALTER TABLE public.office_locations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow read office locations" ON public.office_locations FOR SELECT USING (true);
 CREATE POLICY "Allow edit office locations by admin/hr" ON public.office_locations FOR ALL USING (public.is_admin_or_hr());
 
--- Seed Default HQ Office Location
-INSERT INTO public.office_locations (name, allowed_ip_addresses) VALUES
-    ('HQ Main Office', ARRAY['127.0.0.1', '::1', '*'])
-ON CONFLICT (name) DO NOTHING;
+-- Announcements Table
+CREATE TABLE IF NOT EXISTS public.announcements (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    category TEXT CHECK (category IN ('General', 'Urgent', 'Event', 'Policy')) DEFAULT 'General',
+    is_pinned BOOLEAN DEFAULT FALSE,
+    target_department TEXT DEFAULT 'All',
+    author_name TEXT DEFAULT 'HR Team',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.announcements ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow read announcements" ON public.announcements FOR SELECT USING (true);
+CREATE POLICY "Allow edit announcements by admin/hr" ON public.announcements FOR ALL USING (public.is_admin_or_hr());
+
+-- Seed Sample Broadcast Announcements
+INSERT INTO public.announcements (title, content, category, is_pinned, author_name) VALUES
+    ('Annual Townhall Meeting & Q3 Strategy Presentation', 'Join us this Friday at 3:00 PM for our virtual Townhall. Executive leadership will share product roadmap updates and celebrate team accomplishments!', 'Event', true, 'Ananya Gupta (HR Lead)'),
+    ('Updated Remote Work & Wi-Fi Check-in Policy', 'Please ensure you are connected to an approved Office Wi-Fi network when punching in for office days. Contact HR for WFH exception overrides.', 'Policy', true, 'Ananya Gupta (HR Lead)'),
+    ('Q3 Wellness Allowance Claim Submission Deadline', 'Friendly reminder to submit your fitness and wellness expense claims before the end of the month to receive reimbursement in this payroll cycle.', 'General', false, 'Finance Team')
+ON CONFLICT DO NOTHING;
+
 
 
