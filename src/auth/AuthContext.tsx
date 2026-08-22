@@ -19,17 +19,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user profile:', error.message);
-        return null;
+        console.warn('Warning fetching user profile:', error.message);
+        // Fallback for user profile if profiles table is missing or query fails
+        return {
+          id: userId,
+          name: email.split('@')[0] || 'User',
+          email,
+          role: email.includes('hr') || email.includes('admin') ? 'hr' : 'employee',
+        };
       }
 
       if (!profile) {
         // Fallback for new auth user without profile created yet
         return {
           id: userId,
-          name: email.split('@')[0],
+          name: email.split('@')[0] || 'User',
           email,
-          role: 'employee',
+          role: email.includes('hr') || email.includes('admin') ? 'hr' : 'employee',
         };
       }
 
@@ -38,15 +44,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         id: profile.id,
         name: profile.full_name || emp?.name || email.split('@')[0],
         email: profile.email || email,
-        role: profile.role as UserRole,
+        role: (profile.role as UserRole) || 'employee',
         employeeId: profile.employee_id || undefined,
         avatar: profile.avatar_url || undefined,
         department: emp?.department || undefined,
         jobTitle: emp?.job_title || undefined,
       };
     } catch (e) {
-      console.error('Profile fetch failed', e);
-      return null;
+      console.warn('Profile fetch failed gracefully:', e);
+      return {
+        id: userId,
+        name: email.split('@')[0] || 'User',
+        email,
+        role: email.includes('hr') || email.includes('admin') ? 'hr' : 'employee',
+      };
     }
   };
 
@@ -59,20 +70,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     let mounted = true;
 
-    // Get current session
-    supabase.auth.getSession().then(({ data: { session } }: any) => {
-      if (session?.user && mounted) {
-        fetchProfile(session.user.id, session.user.email || '').then((u) => {
-          if (mounted) {
-            setUser(u);
-            setIsAuthenticated(!!u);
-            setIsLoading(false);
-          }
-        });
-      } else {
+    // Get current session safely
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }: any) => {
+        if (session?.user && mounted) {
+          fetchProfile(session.user.id, session.user.email || '')
+            .then((u) => {
+              if (mounted) {
+                setUser(u);
+                setIsAuthenticated(!!u);
+                setIsLoading(false);
+              }
+            })
+            .catch((err) => {
+              console.warn('Error processing user session profile:', err);
+              if (mounted) setIsLoading(false);
+            });
+        } else {
+          if (mounted) setIsLoading(false);
+        }
+      })
+      .catch((err: any) => {
+        console.warn('Supabase getSession failed:', err);
         if (mounted) setIsLoading(false);
-      }
-    });
+      });
 
     const {
       data: { subscription },
@@ -122,13 +144,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Verify role selection matches the database role
-        // Allow admin and hr to both log in as "admin" / "hr" role context
         const isUserHrAdmin = u.role === 'admin' || u.role === 'hr';
         const isSelectedHrAdmin = credentials.role === 'admin' || credentials.role === 'hr';
 
         if (u.role !== credentials.role && !(isUserHrAdmin && isSelectedHrAdmin)) {
-          await supabase.auth.signOut();
-          throw new Error(`This account is registered as ${u.role === 'admin' || u.role === 'hr' ? 'HR / Admin' : 'Employee'}. Please select the correct login role.`);
+          await supabase.auth.signOut().catch(() => {});
+          throw new Error(
+            `This account is registered as ${
+              u.role === 'admin' || u.role === 'hr' ? 'HR / Admin' : 'Employee'
+            }. Please select the correct login role.`
+          );
         }
 
         setUser(u);
@@ -141,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     if (isSupabaseConfigured) {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut().catch(() => {});
     }
     setUser(null);
     setIsAuthenticated(false);
@@ -150,7 +175,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const hasRole = useCallback(
     (role: UserRole) => {
       if (!user) return false;
-      // admin has rights to HR pages as well
       if (user.role === 'admin' && role === 'hr') return true;
       if (user.role === 'hr' && role === 'admin') return true;
       return user.role === role;

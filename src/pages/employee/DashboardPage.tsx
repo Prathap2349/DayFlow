@@ -38,11 +38,15 @@ export function EmployeeDashboardPage() {
   const [myLeaveRequests, setMyLeaveRequests] = useState<LeaveRequest[]>([]);
 
   const loadData = async () => {
-    const today = await attendanceService.getTodayRecord(empId);
-    setTodayRecord(today);
+    try {
+      const today = await attendanceService.getTodayRecord(empId);
+      setTodayRecord(today);
 
-    const leaves = await leaveService.getLeaveRequests(empId);
-    setMyLeaveRequests(leaves);
+      const leaves = await leaveService.getLeaveRequests(empId);
+      setMyLeaveRequests(leaves);
+    } catch (err) {
+      console.warn('Error loading employee dashboard data:', err);
+    }
   };
 
   useEffect(() => {

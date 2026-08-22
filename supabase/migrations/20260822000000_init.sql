@@ -309,3 +309,29 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- =======================================================
+-- INITIAL SEED DATA FOR DAYFLOW DEMO WORKFORCE
+-- =======================================================
+
+-- 1. Departments
+INSERT INTO public.departments (name, description) VALUES
+    ('Engineering', 'Software engineering, platform architecture, devops'),
+    ('Human Resources', 'People management, talent acquisition, HR compliance'),
+    ('Marketing', 'Brand growth, digital campaigns, public relations'),
+    ('Finance', 'Financial planning, accounting, payroll management'),
+    ('Operations', 'Workflow optimization, office management, IT support')
+ON CONFLICT (name) DO NOTHING;
+
+-- 2. Initial Employees
+INSERT INTO public.employees (
+    employee_code, first_name, last_name, email, phone, job_title,
+    employment_type, joining_date, employment_status, basic_salary, hra, special_allowance, pf_deduction, tax_deduction, net_salary
+) VALUES
+    ('EMP001', 'Arjun', 'Sharma', 'employee@dayflow.demo', '+91 98765 43210', 'Senior Full Stack Engineer', 'Full-time', '2023-01-15', 'Active', 50000, 20000, 15000, 6000, 4000, 75000),
+    ('EMP002', 'Priya', 'Verma', 'priya.v@dayflow.demo', '+91 98765 43211', 'Lead UI/UX Designer', 'Full-time', '2023-03-01', 'Active', 45000, 18000, 12000, 5400, 3600, 66000),
+    ('EMP003', 'Rahul', 'Nair', 'rahul.n@dayflow.demo', '+91 98765 43212', 'DevOps & Cloud Engineer', 'Full-time', '2022-11-10', 'Active', 55000, 22000, 16000, 6600, 4400, 82000),
+    ('EMP004', 'Ananya', 'Gupta', 'hr@dayflow.demo', '+91 98765 43213', 'HR Operations Lead', 'Full-time', '2022-06-15', 'Active', 60000, 24000, 18000, 7200, 4800, 90000),
+    ('EMP005', 'Vikram', 'Singh', 'vikram.s@dayflow.demo', '+91 98765 43214', 'Senior Product Manager', 'Full-time', '2023-05-20', 'On Leave', 65000, 26000, 19000, 7800, 5200, 97000)
+ON CONFLICT (employee_code) DO NOTHING;
+

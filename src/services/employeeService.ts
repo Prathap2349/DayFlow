@@ -4,32 +4,42 @@ import type { Employee } from '../types/employee';
 
 export const employeeService = {
   async getEmployees(): Promise<Employee[]> {
-    const { data, error } = await supabase
-      .from('employees')
-      .select('*, departments(*)')
-      .order('first_name', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('employees')
+        .select('*, departments(*)')
+        .order('first_name', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching employees:', error.message);
-      throw new Error(error.message);
+      if (error) {
+        console.warn('Error fetching employees from Supabase:', error.message);
+        return [];
+      }
+
+      return (data || []).map(this.mapDbRecord);
+    } catch (err) {
+      console.warn('Unhandled exception in getEmployees:', err);
+      return [];
     }
-
-    return (data || []).map(this.mapDbRecord);
   },
 
   async getEmployeeById(idOrCode: string): Promise<Employee | null> {
-    const { data, error } = await supabase
-      .from('employees')
-      .select('*, departments(*)')
-      .or(`id.eq.${idOrCode},employee_code.eq.${idOrCode}`)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from('employees')
+        .select('*, departments(*)')
+        .or(`id.eq.${idOrCode},employee_code.eq.${idOrCode}`)
+        .maybeSingle();
 
-    if (error) {
-      console.error('Error fetching employee details:', error.message);
-      throw new Error(error.message);
+      if (error) {
+        console.warn('Error fetching employee details:', error.message);
+        return null;
+      }
+
+      return data ? this.mapDbRecord(data) : null;
+    } catch (err) {
+      console.warn('Unhandled exception in getEmployeeById:', err);
+      return null;
     }
-
-    return data ? this.mapDbRecord(data) : null;
   },
 
   async createEmployee(data: Omit<Employee, 'id'>): Promise<Employee> {
@@ -45,8 +55,6 @@ export const employeeService = {
       throw new Error(error.message);
     }
 
-    // Automatically create a profile user mapping trigger in PostgreSQL handles this,
-    // but we can ensure a profile or link it correctly here.
     return this.mapDbRecord(created);
   },
 

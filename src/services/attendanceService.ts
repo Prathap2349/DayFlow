@@ -5,77 +5,92 @@ import type { Employee } from '../types/employee';
 
 export const attendanceService = {
   async getTodayRecord(employeeId: string): Promise<AttendanceRecord | null> {
-    const today = new Date().toISOString().split('T')[0];
-    const { data: emp, error: empErr } = await supabase
-      .from('employees')
-      .select('id')
-      .or(`id.eq.${employeeId},employee_code.eq.${employeeId}`)
-      .maybeSingle();
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data: emp, error: empErr } = await supabase
+        .from('employees')
+        .select('id')
+        .or(`id.eq.${employeeId},employee_code.eq.${employeeId}`)
+        .maybeSingle();
 
-    if (empErr || !emp) return null;
+      if (empErr || !emp) return null;
 
-    const { data, error } = await supabase
-      .from('attendance')
-      .select('*')
-      .eq('employee_id', emp.id)
-      .eq('attendance_date', today)
-      .maybeSingle();
+      const { data, error } = await supabase
+        .from('attendance')
+        .select('*')
+        .eq('employee_id', emp.id)
+        .eq('attendance_date', today)
+        .maybeSingle();
 
-    if (error) {
-      console.error('Error fetching today attendance:', error.message);
+      if (error) {
+        console.warn('Error fetching today attendance:', error.message);
+        return null;
+      }
+
+      return data ? this.mapDbRecord(data) : null;
+    } catch (err) {
+      console.warn('Unhandled exception in getTodayRecord:', err);
       return null;
     }
-
-    return data ? this.mapDbRecord(data) : null;
   },
 
   async getAllAttendance(date?: string): Promise<AttendanceRecord[]> {
-    const targetDate = date ?? new Date().toISOString().split('T')[0];
-    const { data, error } = await supabase
-      .from('attendance')
-      .select('*, employees(*)')
-      .eq('attendance_date', targetDate);
+    try {
+      const targetDate = date ?? new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('attendance')
+        .select('*, employees(*)')
+        .eq('attendance_date', targetDate);
 
-    if (error) {
-      console.error('Error getting all attendance:', error.message);
-      throw new Error(error.message);
+      if (error) {
+        console.warn('Error getting all attendance:', error.message);
+        return [];
+      }
+
+      return (data || []).map((r: any) => ({
+        id: r.id,
+        employeeId: r.employees?.employee_code || '',
+        employeeName: `${r.employees?.first_name || ''} ${r.employees?.last_name || ''}`.trim(),
+        department: r.employees?.department_id || 'Operations',
+        date: r.attendance_date,
+        checkInTime: r.check_in ? new Date(r.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
+        checkOutTime: r.check_out ? new Date(r.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
+        workingHours: r.working_minutes ? Math.round((r.working_minutes / 60) * 10) / 10 : undefined,
+        status: this.mapDbStatus(r.status),
+        notes: r.notes || '',
+      }));
+    } catch (err) {
+      console.warn('Unhandled exception in getAllAttendance:', err);
+      return [];
     }
-
-    return (data || []).map((r: any) => ({
-      id: r.id,
-      employeeId: r.employees?.employee_code || '',
-      employeeName: `${r.employees?.first_name || ''} ${r.employees?.last_name || ''}`.trim(),
-      department: r.employees?.department_id || 'Operations',
-      date: r.attendance_date,
-      checkInTime: r.check_in ? new Date(r.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
-      checkOutTime: r.check_out ? new Date(r.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
-      workingHours: r.working_minutes ? Math.round((r.working_minutes / 60) * 10) / 10 : undefined,
-      status: this.mapDbStatus(r.status),
-      notes: r.notes || '',
-    }));
   },
 
   async getEmployeeAttendanceHistory(employeeId: string): Promise<AttendanceRecord[]> {
-    const { data: emp, error: empErr } = await supabase
-      .from('employees')
-      .select('id')
-      .or(`id.eq.${employeeId},employee_code.eq.${employeeId}`)
-      .maybeSingle();
+    try {
+      const { data: emp, error: empErr } = await supabase
+        .from('employees')
+        .select('id')
+        .or(`id.eq.${employeeId},employee_code.eq.${employeeId}`)
+        .maybeSingle();
 
-    if (empErr || !emp) return [];
+      if (empErr || !emp) return [];
 
-    const { data, error } = await supabase
-      .from('attendance')
-      .select('*')
-      .eq('employee_id', emp.id)
-      .order('attendance_date', { ascending: false });
+      const { data, error } = await supabase
+        .from('attendance')
+        .select('*')
+        .eq('employee_id', emp.id)
+        .order('attendance_date', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching attendance history:', error.message);
-      throw new Error(error.message);
+      if (error) {
+        console.warn('Error fetching attendance history:', error.message);
+        return [];
+      }
+
+      return (data || []).map(this.mapDbRecord);
+    } catch (err) {
+      console.warn('Unhandled exception in getEmployeeAttendanceHistory:', err);
+      return [];
     }
-
-    return (data || []).map(this.mapDbRecord);
   },
 
   async checkIn(employee: Employee): Promise<AttendanceRecord> {
@@ -169,19 +184,24 @@ export const attendanceService = {
   },
 
   async getAttendanceSummary(date?: string): Promise<AttendanceSummary> {
-    const targetDate = date ?? new Date().toISOString().split('T')[0];
-    const records = await this.getAllAttendance(targetDate);
-    const { count: totalEmployees } = await supabase
-      .from('employees')
-      .select('*', { count: 'exact', head: true });
+    try {
+      const targetDate = date ?? new Date().toISOString().split('T')[0];
+      const records = await this.getAllAttendance(targetDate);
+      const { count: totalEmployees } = await supabase
+        .from('employees')
+        .select('*', { count: 'exact', head: true });
 
-    return {
-      present: records.filter(r => r.status === 'Present').length,
-      absent: records.filter(r => r.status === 'Absent').length,
-      halfDay: records.filter(r => r.status === 'Half Day').length,
-      onLeave: records.filter(r => r.status === 'On Leave').length,
-      total: totalEmployees || records.length,
-    };
+      return {
+        present: records.filter(r => r.status === 'Present').length,
+        absent: records.filter(r => r.status === 'Absent').length,
+        halfDay: records.filter(r => r.status === 'Half Day').length,
+        onLeave: records.filter(r => r.status === 'On Leave').length,
+        total: totalEmployees || records.length || 0,
+      };
+    } catch (err) {
+      console.warn('Unhandled exception in getAttendanceSummary:', err);
+      return { present: 0, absent: 0, halfDay: 0, onLeave: 0, total: 0 };
+    }
   },
 
   mapDbRecord(r: any): AttendanceRecord {

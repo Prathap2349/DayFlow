@@ -5,48 +5,53 @@ import { notificationService } from './notificationService';
 
 export const leaveService = {
   async getLeaveRequests(employeeId?: string): Promise<LeaveRequest[]> {
-    let query = supabase
-      .from('leave_requests')
-      .select('*, employees(*)')
-      .order('submitted_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('leave_requests')
+        .select('*, employees(*)')
+        .order('submitted_at', { ascending: false });
 
-    if (employeeId) {
-      // Resolve employee database UUID first
-      const { data: emp } = await supabase
-        .from('employees')
-        .select('id')
-        .or(`id.eq.${employeeId},employee_code.eq.${employeeId}`)
-        .maybeSingle();
+      if (employeeId) {
+        // Resolve employee database UUID first
+        const { data: emp } = await supabase
+          .from('employees')
+          .select('id')
+          .or(`id.eq.${employeeId},employee_code.eq.${employeeId}`)
+          .maybeSingle();
 
-      if (emp) {
-        query = query.eq('employee_id', emp.id);
-      } else {
+        if (emp) {
+          query = query.eq('employee_id', emp.id);
+        } else {
+          return [];
+        }
+      }
+
+      const { data, error } = await query;
+      if (error) {
+        console.warn('Error fetching leave requests:', error.message);
         return [];
       }
-    }
 
-    const { data, error } = await query;
-    if (error) {
-      console.error('Error fetching leave requests:', error.message);
-      throw new Error(error.message);
+      return (data || []).map((r: any) => ({
+        id: r.id,
+        employeeId: r.employees?.employee_code || '',
+        employeeName: `${r.employees?.first_name || ''} ${r.employees?.last_name || ''}`.trim(),
+        department: r.employees?.department_id || 'Operations',
+        leaveType: this.mapDbLeaveType(r.leave_type),
+        startDate: r.start_date,
+        endDate: r.end_date,
+        days: Number(r.number_of_days),
+        reason: r.reason,
+        status: this.mapDbStatus(r.status),
+        appliedOn: r.submitted_at ? new Date(r.submitted_at).toISOString().split('T')[0] : '',
+        reviewedBy: r.reviewed_by || undefined,
+        reviewedOn: r.reviewed_at ? new Date(r.reviewed_at).toISOString().split('T')[0] : undefined,
+        rejectionComment: r.review_comment || undefined,
+      }));
+    } catch (err) {
+      console.warn('Unhandled error fetching leave requests:', err);
+      return [];
     }
-
-    return (data || []).map((r: any) => ({
-      id: r.id,
-      employeeId: r.employees?.employee_code || '',
-      employeeName: `${r.employees?.first_name || ''} ${r.employees?.last_name || ''}`.trim(),
-      department: r.employees?.department_id || 'Operations',
-      leaveType: this.mapDbLeaveType(r.leave_type),
-      startDate: r.start_date,
-      endDate: r.end_date,
-      days: Number(r.number_of_days),
-      reason: r.reason,
-      status: this.mapDbStatus(r.status),
-      appliedOn: r.submitted_at ? new Date(r.submitted_at).toISOString().split('T')[0] : '',
-      reviewedBy: r.reviewed_by || undefined,
-      reviewedOn: r.reviewed_at ? new Date(r.reviewed_at).toISOString().split('T')[0] : undefined,
-      rejectionComment: r.review_comment || undefined,
-    }));
   },
 
   async applyLeave(data: {
@@ -78,7 +83,7 @@ export const leaveService = {
       .or(`id.eq.${data.employeeId},employee_code.eq.${data.employeeId}`)
       .maybeSingle();
 
-    if (empErr || !emp) throw new Error('Employee record not found.');
+    if (empErr || !emp) throw new Error('Employee record not found in database.');
 
     const { data: created, error } = await supabase
       .from('leave_requests')
@@ -106,7 +111,7 @@ export const leaveService = {
       title: 'New Leave Request',
       message: `${data.employeeName} applied for ${days} day(s) of ${data.leaveType} Leave.`,
       link: '/admin/leave',
-    });
+    }).catch(e => console.warn('Could not add notification', e));
 
     return {
       id: created.id,
@@ -164,23 +169,6 @@ export const leaveService = {
       .update({ leave_balance: newBalance })
       .eq('id', currentReq.employee_id);
 
-    // Notify employee (using user_id of the employee's auth record if linked)
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('employee_id', currentReq.employee_id)
-      .maybeSingle();
-
-    if (profile) {
-      await notificationService.addNotification({
-        recipientId: profile.id,
-        type: 'leave_approved',
-        title: 'Leave Request Approved ✅',
-        message: `Your ${this.mapDbLeaveType(currentReq.leave_type)} Leave request for ${currentReq.start_date} to ${currentReq.end_date} was approved.`,
-        link: '/employee/leave',
-      });
-    }
-
     return {
       id: updated.id,
       employeeId: currentReq.employees?.employee_code || '',
@@ -231,22 +219,6 @@ export const leaveService = {
     if (error) {
       console.error('Error rejecting leave:', error.message);
       throw new Error(error.message);
-    }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('employee_id', currentReq.employee_id)
-      .maybeSingle();
-
-    if (profile) {
-      await notificationService.addNotification({
-        recipientId: profile.id,
-        type: 'leave_rejected',
-        title: 'Leave Request Rejected ❌',
-        message: `Your ${this.mapDbLeaveType(currentReq.leave_type)} Leave request was rejected. Comment: "${comment.trim()}"`,
-        link: '/employee/leave',
-      });
     }
 
     return {

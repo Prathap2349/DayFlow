@@ -43,14 +43,18 @@ export function AdminDashboardPage() {
   const [rejectionReason, setRejectionReason] = useState('');
 
   const loadAllData = async () => {
-    const emps = await employeeService.getEmployees();
-    setEmployees(emps);
+    try {
+      const emps = await employeeService.getEmployees();
+      setEmployees(emps);
 
-    const leaves = await leaveService.getLeaveRequests();
-    setLeaveRequests(leaves);
+      const leaves = await leaveService.getLeaveRequests();
+      setLeaveRequests(leaves);
 
-    const summary = await attendanceService.getAttendanceSummary();
-    setAttSummary(summary);
+      const summary = await attendanceService.getAttendanceSummary();
+      setAttSummary(summary);
+    } catch (err) {
+      console.warn('Error loading admin dashboard data:', err);
+    }
   };
 
   useEffect(() => {
