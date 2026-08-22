@@ -37,9 +37,19 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
   }
 
   // Role-based access: redirect to own dashboard if wrong role
-  if (requiredRole && user?.role !== requiredRole) {
-    const redirectTo = user?.role === 'admin' ? '/admin/dashboard' : '/employee/dashboard';
-    return <Navigate to={redirectTo} replace />;
+  if (requiredRole) {
+    const isUserHrAdmin = user?.role === 'admin' || user?.role === 'hr';
+    const isRequiredHrAdmin = requiredRole === 'admin' || requiredRole === 'hr';
+
+    // If route requires HR/Admin but user is Employee
+    if (isRequiredHrAdmin && !isUserHrAdmin) {
+      return <Navigate to="/employee/dashboard" replace />;
+    }
+
+    // If route requires Employee but user is HR/Admin (optional strictness, usually fine though)
+    if (requiredRole === 'employee' && isUserHrAdmin) {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
   }
 
   return <>{children}</>;

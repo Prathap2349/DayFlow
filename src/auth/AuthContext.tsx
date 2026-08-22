@@ -143,17 +143,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error('User profile record could not be loaded.');
         }
 
-        // Verify role selection matches the database role
-        const isUserHrAdmin = u.role === 'admin' || u.role === 'hr';
-        const isSelectedHrAdmin = credentials.role === 'admin' || credentials.role === 'hr';
-
-        if (u.role !== credentials.role && !(isUserHrAdmin && isSelectedHrAdmin)) {
+        if (!u.role) {
           await supabase.auth.signOut().catch(() => {});
-          throw new Error(
-            `This account is registered as ${
-              u.role === 'admin' || u.role === 'hr' ? 'HR / Admin' : 'Employee'
-            }. Please select the correct login role.`
-          );
+          throw new Error('No role assigned to this account. Please contact HR.');
         }
 
         setUser(u);

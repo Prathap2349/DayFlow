@@ -410,7 +410,7 @@ export function AdminEmployeesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Employee Directory</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Manage workforce records, roles, and profiles</p>
+          <p className="text-xs text-slate-600 mt-0.5">Manage workforce records, roles, and profiles</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" onClick={() => setImportModalOpen(true)} leftIcon={<Upload className="w-4 h-4" />}>
@@ -427,7 +427,7 @@ export function AdminEmployeesPage() {
         {/* Controls Bar */}
         <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 w-4 h-4" />
             <input
               type="text"
               placeholder="Search employee, ID, dept..."
@@ -438,7 +438,7 @@ export function AdminEmployeesPage() {
           </div>
 
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+            <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
               <Filter className="w-3.5 h-3.5" /> Department:
             </div>
             <select
@@ -451,7 +451,7 @@ export function AdminEmployeesPage() {
               ))}
             </select>
 
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium ml-2">
+            <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium ml-2">
               Status:
             </div>
             <select
@@ -470,7 +470,7 @@ export function AdminEmployeesPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50 text-slate-500 uppercase tracking-wider text-[11px] font-semibold">
+              <tr className="border-b border-slate-100 bg-slate-50 text-slate-600 uppercase tracking-wider text-[11px] font-semibold">
                 <th className="text-left px-4 py-3">Employee</th>
                 <th className="text-left px-3 py-3">Emp ID</th>
                 <th className="text-left px-3 py-3 hidden sm:table-cell">Department</th>
@@ -483,11 +483,11 @@ export function AdminEmployeesPage() {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400">Loading employees...</td>
+                  <td colSpan={7} className="p-8 text-center text-slate-600">Loading employees...</td>
                 </tr>
               ) : paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400">
+                  <td colSpan={7} className="p-8 text-center text-slate-600">
                     No employees found. click "Add Employee" or "Import Employees" to seed workforce.
                   </td>
                 </tr>
@@ -499,7 +499,7 @@ export function AdminEmployeesPage() {
                         <Avatar name={emp.name} size="sm" />
                         <div>
                           <p className="font-semibold text-slate-900">{emp.name}</p>
-                          <p className="text-[11px] text-slate-400">{emp.email}</p>
+                          <p className="text-[11px] text-slate-600">{emp.email}</p>
                         </div>
                       </div>
                     </td>
@@ -538,14 +538,14 @@ export function AdminEmployeesPage() {
                         <button
                           onClick={() => { setSelectedEmployee(emp); setViewDetailModalOpen(true); }}
                           title="View Details"
-                          className="p-1.5 rounded-md hover:bg-indigo-50 text-slate-500 hover:text-indigo-600"
+                          className="p-1.5 rounded-md hover:bg-indigo-50 text-slate-600 hover:text-indigo-600"
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleOpenEditModal(emp)}
                           title="Edit"
-                          className="p-1.5 rounded-md hover:bg-blue-50 text-slate-500 hover:text-blue-600"
+                          className="p-1.5 rounded-md hover:bg-blue-50 text-slate-600 hover:text-blue-600"
                         >
                           <Edit className="w-3.5 h-3.5" />
                         </button>
@@ -559,7 +559,7 @@ export function AdminEmployeesPage() {
                         <button
                           onClick={() => handleDelete(emp)}
                           title="Delete"
-                          className="p-1.5 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-600"
+                          className="p-1.5 rounded-md hover:bg-red-50 text-slate-600 hover:text-red-600"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -574,7 +574,7 @@ export function AdminEmployeesPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="p-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <div className="p-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
             <span>Showing {paginated.length} of {filtered.length} employees</span>
             <div className="flex items-center gap-1">
               <button
@@ -603,7 +603,7 @@ export function AdminEmployeesPage() {
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-fade-in">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900">Add New Employee</h3>
-              <button onClick={() => setAddModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+              <button onClick={() => setAddModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -691,7 +691,7 @@ export function AdminEmployeesPage() {
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-fade-in">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900">Edit Employee Details</h3>
-              <button onClick={() => setEditModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+              <button onClick={() => setEditModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -756,14 +756,14 @@ export function AdminEmployeesPage() {
                 <Avatar name={selectedEmployee.name} size="xl" />
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">{selectedEmployee.name}</h3>
-                  <p className="text-xs text-slate-500">{selectedEmployee.jobTitle} · {selectedEmployee.department}</p>
+                  <p className="text-xs text-slate-600">{selectedEmployee.jobTitle} · {selectedEmployee.department}</p>
                   <div className="mt-1 flex items-center gap-2">
                     <Badge variant="purple">{selectedEmployee.employeeId}</Badge>
                     <StatusBadge status={selectedEmployee.status} />
                   </div>
                 </div>
               </div>
-              <button onClick={() => setViewDetailModalOpen(false)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
+              <button onClick={() => setViewDetailModalOpen(false)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -830,9 +830,9 @@ export function AdminEmployeesPage() {
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">Spreadsheet Importer</h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Bulk register company employees via CSV uploads</p>
+                <p className="text-[11px] text-slate-600 mt-0.5">Bulk register company employees via CSV uploads</p>
               </div>
-              <button onClick={() => { setImportModalOpen(false); setImportStep(1); }} className="p-1 text-slate-400">
+              <button onClick={() => { setImportModalOpen(false); setImportStep(1); }} className="p-1 text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -840,9 +840,9 @@ export function AdminEmployeesPage() {
             {/* Step Content */}
             {importStep === 1 && (
               <div className="py-6 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl mt-4">
-                <Upload className="w-10 h-10 text-slate-400 mb-2" />
+                <Upload className="w-10 h-10 text-slate-600 mb-2" />
                 <p className="font-semibold text-slate-700">Choose CSV File to upload</p>
-                <p className="text-[11px] text-slate-400 mt-0.5 mb-4">Make sure headers match employee schema attributes</p>
+                <p className="text-[11px] text-slate-600 mt-0.5 mb-4">Make sure headers match employee schema attributes</p>
                 <input
                   type="file"
                   accept=".csv"
@@ -860,7 +860,7 @@ export function AdminEmployeesPage() {
               <div className="py-4 space-y-4">
                 <div className="bg-slate-50 p-3 rounded-xl">
                   <p className="font-semibold text-slate-800">Column Alignment mapping</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Map your spreadsheet columns to Dayflow Fields</p>
+                  <p className="text-[11px] text-slate-600 mt-0.5">Map your spreadsheet columns to Dayflow Fields</p>
                 </div>
 
                 <div className="max-h-60 overflow-y-auto space-y-2.5">
@@ -920,7 +920,7 @@ export function AdminEmployeesPage() {
                   <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                     <div>
                       <p className="font-semibold text-slate-800">Duplicate Handling</p>
-                      <p className="text-[10px] text-slate-400">Choose how duplicates should be handled</p>
+                      <p className="text-[10px] text-slate-600">Choose how duplicates should be handled</p>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <button
@@ -971,21 +971,21 @@ export function AdminEmployeesPage() {
                 <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
                 <div>
                   <h4 className="text-base font-bold text-slate-900">Bulk Import Finished!</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Spreadsheet records processed securely</p>
+                  <p className="text-[11px] text-slate-600 mt-0.5">Spreadsheet records processed securely</p>
                 </div>
 
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 max-w-sm mx-auto grid grid-cols-3 gap-2">
                   <div>
                     <p className="font-bold text-slate-800 text-lg">{importSummary.success}</p>
-                    <p className="text-[10px] text-slate-400 uppercase font-semibold">Imported</p>
+                    <p className="text-[10px] text-slate-600 uppercase font-semibold">Imported</p>
                   </div>
                   <div>
                     <p className="font-bold text-slate-800 text-lg">{importSummary.skipped}</p>
-                    <p className="text-[10px] text-slate-400 uppercase font-semibold">Skipped</p>
+                    <p className="text-[10px] text-slate-600 uppercase font-semibold">Skipped</p>
                   </div>
                   <div>
                     <p className="font-bold text-slate-800 text-lg">{importSummary.failed}</p>
-                    <p className="text-[10px] text-slate-400 uppercase font-semibold">Failed</p>
+                    <p className="text-[10px] text-slate-600 uppercase font-semibold">Failed</p>
                   </div>
                 </div>
 

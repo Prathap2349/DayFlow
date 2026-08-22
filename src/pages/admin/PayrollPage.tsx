@@ -100,7 +100,7 @@ export function AdminPayrollPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Workforce Payroll Management</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Manage salary structures, allowances, and monthly payrolls</p>
+          <p className="text-xs text-slate-600 mt-0.5">Manage salary structures, allowances, and monthly payrolls</p>
         </div>
       </div>
 
@@ -132,7 +132,7 @@ export function AdminPayrollPage() {
         <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
           <CardHeader title="Employee Salary Directory" subtitle="Manage individual salary packages" />
           <div className="relative w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 w-4 h-4" />
             <input
               type="text"
               placeholder="Search employee, dept..."
@@ -146,7 +146,7 @@ export function AdminPayrollPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50 text-slate-500 uppercase tracking-wider text-[11px] font-semibold">
+              <tr className="border-b border-slate-100 bg-slate-50 text-slate-600 uppercase tracking-wider text-[11px] font-semibold">
                 <th className="text-left px-5 py-3">Employee</th>
                 <th className="text-left px-4 py-3">Department</th>
                 <th className="text-left px-4 py-3">Basic Pay</th>
@@ -169,7 +169,7 @@ export function AdminPayrollPage() {
                         <Avatar name={emp.name} size="sm" />
                         <div>
                           <p className="font-semibold text-slate-900">{emp.name}</p>
-                          <p className="text-[11px] text-slate-400">{emp.employeeId}</p>
+                          <p className="text-[11px] text-slate-600">{emp.employeeId}</p>
                         </div>
                       </div>
                     </td>
@@ -209,7 +209,7 @@ export function AdminPayrollPage() {
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md p-6 animate-fade-in">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-900">Update Salary Package</h3>
-              <button onClick={() => setModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+              <button onClick={() => setModalOpen(false)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -217,7 +217,7 @@ export function AdminPayrollPage() {
             <form onSubmit={handleSaveSalary} className="space-y-4 mt-4 text-xs">
               <div className="p-3 bg-slate-50 rounded-xl">
                 <p className="font-bold text-slate-900">{selectedEmp.name}</p>
-                <p className="text-slate-500">{selectedEmp.jobTitle} · {selectedEmp.employeeId}</p>
+                <p className="text-slate-600">{selectedEmp.jobTitle} · {selectedEmp.employeeId}</p>
               </div>
 
               <Input

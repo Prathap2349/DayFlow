@@ -24,10 +24,10 @@ function getGreeting(): string {
 }
 
 const quickActions = [
-  { label: 'View Attendance', icon: CalendarCheck, to: '/employee/attendance', color: 'bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-900/50 hover:bg-blue-100 dark:hover:bg-blue-950/60' },
-  { label: 'Apply for Leave', icon: Palmtree, to: '/employee/leave', color: 'bg-amber-50/80 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-950/60' },
-  { label: 'View Profile', icon: User, to: '/employee/profile', color: 'bg-violet-50/80 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border-violet-100 dark:border-violet-900/50 hover:bg-violet-100 dark:hover:bg-violet-950/60' },
-  { label: 'Notifications', icon: Bell, to: '/employee/notifications', color: 'bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-950/60' },
+  { label: 'View Attendance', icon: CalendarCheck, to: '/employee/attendance', color: 'bg-blue-50/80  text-blue-700  border-blue-100  hover:bg-blue-100 ' },
+  { label: 'Apply for Leave', icon: Palmtree, to: '/employee/leave', color: 'bg-amber-50/80  text-amber-700  border-amber-100  hover:bg-amber-100 ' },
+  { label: 'View Profile', icon: User, to: '/employee/profile', color: 'bg-violet-50/80  text-violet-700  border-violet-100  hover:bg-violet-100 ' },
+  { label: 'Notifications', icon: Bell, to: '/employee/notifications', color: 'bg-emerald-50/80  text-emerald-700  border-emerald-100  hover:bg-emerald-100 ' },
 ];
 
 export function EmployeeDashboardPage() {
@@ -95,10 +95,10 @@ export function EmployeeDashboardPage() {
       {/* Welcome */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <h2 className="text-2xl font-bold text-slate-900 ">
             {getGreeting()}, {firstName} 👋
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">
+          <p className="text-slate-600  mt-1 text-sm">
             Here's what's happening with your workday.
           </p>
         </div>
@@ -152,12 +152,12 @@ export function EmployeeDashboardPage() {
       </div>
 
       {/* Gamification Badges Banner */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50 via-violet-50 to-amber-50 dark:from-indigo-950/40 dark:to-amber-950/20 border border-indigo-100/80 dark:border-indigo-900/40">
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50 via-violet-50 to-amber-50   border border-indigo-100/80 ">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-bold text-indigo-950 dark:text-indigo-200 uppercase tracking-wider flex items-center gap-1.5">
+          <h3 className="text-xs font-bold text-indigo-950  uppercase tracking-wider flex items-center gap-1.5">
             🏆 Workplace Streaks & Achievements
           </h3>
-          <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold cursor-pointer hover:underline" onClick={() => navigate('/employee/profile')}>
+          <span className="text-[11px] text-indigo-600  font-semibold cursor-pointer hover:underline" onClick={() => navigate('/employee/profile')}>
             View All Badges →
           </span>
         </div>
@@ -167,7 +167,7 @@ export function EmployeeDashboardPage() {
               <span className="text-2xl">{b.icon}</span>
               <div>
                 <p className={`text-xs font-bold ${b.colorText}`}>{b.title}</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">{b.description}</p>
+                <p className="text-[10px] text-slate-600  leading-tight mt-0.5">{b.description}</p>
               </div>
             </div>
           ))}
@@ -178,7 +178,7 @@ export function EmployeeDashboardPage() {
         {/* Quick Actions & Working Hours Chart */}
         <div className="lg:col-span-1 space-y-6">
           <div>
-            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Quick Actions</h3>
+            <h3 className="text-sm font-semibold text-slate-700  mb-3">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-3">
               {quickActions.map(({ label, icon: Icon, to, color }) => (
                 <button
@@ -200,7 +200,7 @@ export function EmployeeDashboardPage() {
           </div>
 
           <Card padding="md">
-            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-3">Weekly Hours Logged</h4>
+            <h4 className="text-xs font-bold text-slate-800  mb-3">Weekly Hours Logged</h4>
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={[
@@ -225,7 +225,7 @@ export function EmployeeDashboardPage() {
           <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <div>
               <h3 className="text-base font-semibold text-slate-900">My Leave Submissions</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Live status from leave service</p>
+              <p className="text-xs text-slate-600 mt-0.5">Live status from leave service</p>
             </div>
             <button
               onClick={() => navigate('/employee/leave')}
@@ -236,13 +236,13 @@ export function EmployeeDashboardPage() {
           </div>
           <ul className="divide-y divide-slate-50">
             {myLeaveRequests.length === 0 ? (
-              <li className="px-5 py-8 text-center text-xs text-slate-400">No leave requests found.</li>
+              <li className="px-5 py-8 text-center text-xs text-slate-600">No leave requests found.</li>
             ) : (
               myLeaveRequests.slice(0, 4).map(req => (
                 <li key={req.id} className="flex items-center justify-between px-5 py-3.5 text-xs">
                   <div>
                     <p className="font-semibold text-slate-800">{req.leaveType} Leave ({req.days}d)</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{req.startDate} — {req.endDate}</p>
+                    <p className="text-[11px] text-slate-600 mt-0.5">{req.startDate} — {req.endDate}</p>
                   </div>
                   <Badge variant={req.status === 'Approved' ? 'success' : req.status === 'Rejected' ? 'danger' : 'warning'} dot>
                     {req.status}

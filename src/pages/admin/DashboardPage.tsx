@@ -118,8 +118,8 @@ export function AdminDashboardPage() {
   return (
     <div className="space-y-6 max-w-7xl">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Good morning, HR Team 👋</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Here's your live workforce overview for today.</p>
+        <h2 className="text-2xl font-bold text-slate-900 ">Good morning, HR Team 👋</h2>
+        <p className="text-slate-600  mt-1 text-sm">Here's your live workforce overview for today.</p>
       </div>
 
       {/* Stats Cards derived from Data Layer */}
@@ -160,7 +160,7 @@ export function AdminDashboardPage() {
           <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <CardHeader title="Employee Overview" subtitle={`${filtered.length} employees found`} />
             <div className="relative w-full sm:w-56">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search employees…"
@@ -174,7 +174,7 @@ export function AdminDashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/60 font-semibold text-slate-500 uppercase">
+                <tr className="border-b border-slate-100 bg-slate-50/60 font-semibold text-slate-600 uppercase">
                   <th className="text-left px-5 py-3">Employee</th>
                   <th className="text-left px-3 py-3 hidden md:table-cell">Dept.</th>
                   <th className="text-left px-3 py-3">Status</th>
@@ -189,7 +189,7 @@ export function AdminDashboardPage() {
                         <Avatar name={emp.name} size="sm" />
                         <div>
                           <p className="font-semibold text-slate-900">{emp.name}</p>
-                          <p className="text-[11px] text-slate-400">{emp.employeeId}</p>
+                          <p className="text-[11px] text-slate-600">{emp.employeeId}</p>
                         </div>
                       </div>
                     </td>
@@ -207,7 +207,7 @@ export function AdminDashboardPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
               <span>Page {page} of {totalPages}</span>
               <div className="flex items-center gap-1">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1 rounded hover:bg-slate-100 disabled:opacity-40">
@@ -235,8 +235,8 @@ export function AdminDashboardPage() {
             </PieChart>
           </ResponsiveContainer>
 
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-2">
-            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Weekly Attendance Trend</p>
+          <div className="pt-3 border-t border-slate-100  mt-2">
+            <p className="text-xs font-bold text-slate-700  mb-2">Weekly Attendance Trend</p>
             <div className="h-24">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={[
@@ -271,7 +271,7 @@ export function AdminDashboardPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/60 font-semibold text-slate-500 uppercase">
+              <tr className="border-b border-slate-100 bg-slate-50/60 font-semibold text-slate-600 uppercase">
                 <th className="text-left px-5 py-3">Employee</th>
                 <th className="text-left px-3 py-3">Type</th>
                 <th className="text-left px-3 py-3">Dates</th>
@@ -288,7 +288,7 @@ export function AdminDashboardPage() {
                       <Avatar name={req.employeeName} size="sm" />
                       <div>
                         <p className="font-semibold text-slate-900">{req.employeeName}</p>
-                        <p className="text-[11px] text-slate-400">{req.department}</p>
+                        <p className="text-[11px] text-slate-600">{req.department}</p>
                       </div>
                     </div>
                   </td>
@@ -307,7 +307,7 @@ export function AdminDashboardPage() {
                         </button>
                       </div>
                     ) : (
-                      <span className="text-[11px] text-slate-400">By {req.reviewedBy ?? 'Admin'}</span>
+                      <span className="text-[11px] text-slate-600">By {req.reviewedBy ?? 'Admin'}</span>
                     )}
                   </td>
                 </tr>
@@ -323,7 +323,7 @@ export function AdminDashboardPage() {
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md p-6 animate-fade-in text-xs">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="font-bold text-slate-900">Employee Summary</h3>
-              <button onClick={() => setSelectedEmp(null)} className="p-1 text-slate-400"><X className="w-4 h-4" /></button>
+              <button onClick={() => setSelectedEmp(null)} className="p-1 text-slate-600"><X className="w-4 h-4" /></button>
             </div>
             <div className="py-4 space-y-2">
               <p><strong>Name:</strong> {selectedEmp.name}</p>
@@ -346,7 +346,7 @@ export function AdminDashboardPage() {
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md p-6 animate-fade-in text-xs">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="font-bold text-slate-900">Reject Leave Request</h3>
-              <button onClick={() => setRejectModalOpen(false)} className="p-1 text-slate-400"><X className="w-4 h-4" /></button>
+              <button onClick={() => setRejectModalOpen(false)} className="p-1 text-slate-600"><X className="w-4 h-4" /></button>
             </div>
             <form onSubmit={handleConfirmReject} className="space-y-4 mt-3">
               <p className="text-slate-600">Reject leave for <strong>{selectedReq.employeeName}</strong>?</p>

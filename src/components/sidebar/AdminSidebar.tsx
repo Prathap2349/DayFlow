@@ -57,7 +57,7 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
 
       <aside
         className={clsx(
-          'fixed top-0 left-0 z-40 h-full w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col',
+          'fixed top-0 left-0 z-40 h-full w-64 bg-white  border-r border-slate-100  flex flex-col',
           'transition-transform duration-250 ease-in-out',
           'lg:translate-x-0 lg:static lg:z-auto',
           open ? 'translate-x-0' : '-translate-x-full'
@@ -65,11 +65,11 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
         aria-label="Admin navigation"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-5 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between px-5 py-5 border-b border-slate-100 ">
           <DayflowLogo size="md" />
           <button
             onClick={onClose}
-            className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"
+            className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100  text-slate-400"
             aria-label="Close navigation"
           >
             <X className="w-4 h-4" />
@@ -87,15 +87,15 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
                 clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150',
                   isActive
-                    ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
+                    ? 'bg-indigo-50  text-indigo-700  font-semibold'
+                    : 'text-slate-600  hover:bg-slate-50  hover:text-slate-900 '
                 )
               }
             >
               {({ isActive }) => (
                 <>
                   <Icon
-                    className={clsx('shrink-0', isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500')}
+                    className={clsx('shrink-0', isActive ? 'text-indigo-600 ' : 'text-slate-400 ')}
                     style={{ width: 18, height: 18 }}
                   />
                   {label}
@@ -106,7 +106,7 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
         </nav>
 
         {/* Footer */}
-        <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800 space-y-0.5">
+        <div className="px-3 py-4 border-t border-slate-100  space-y-0.5">
           <NavLink
             to="/admin/settings"
             onClick={onClose}

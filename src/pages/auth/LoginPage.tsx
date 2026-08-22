@@ -1,27 +1,23 @@
 // src/pages/auth/LoginPage.tsx
 import { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../auth/useAuth';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { DayflowLogo } from '../../components/shared/DayflowLogo';
-import type { UserRole } from '../../types/auth';
-import { clsx } from 'clsx';
-
+import { supabase } from '../../db/supabaseClient';
 
 export function LoginPage() {
   const { login, isAuthenticated, isLoading: authLoading, user } = useAuth();
-  const navigate = useNavigate();
 
-  const [role, setRole] = useState<UserRole>('employee');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Already authenticated — redirect
+  // Already authenticated — redirect based on their actual role
   if (!authLoading && isAuthenticated && user) {
     return <Navigate to={user.role === 'admin' || user.role === 'hr' ? '/admin/dashboard' : '/employee/dashboard'} replace />;
   }
@@ -35,17 +31,33 @@ export function LoginPage() {
     setError('');
     setIsLoading(true);
     try {
-      await login({ email: email.trim(), password, role });
-      navigate(role === 'admin' || role === 'hr' ? '/admin/dashboard' : '/employee/dashboard', { replace: true });
+      await login({ email: email.trim(), password });
+      // The AuthContext automatically sets the user state, and the redirect logic above handles navigation
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please verify credentials.');
-    } finally {
       setIsLoading(false);
     }
   };
 
-  const fillDemoCredentials = () => {
-    if (role === 'admin' || role === 'hr') {
+  const handleOAuthLogin = async (provider: 'google' | 'azure') => {
+    setError('');
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/employee/dashboard`, // Fallback, AuthContext will sort it out
+        }
+      });
+      if (error) throw error;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Failed to sign in with ${provider}`);
+      setIsLoading(false);
+    }
+  };
+
+  const fillDemoCredentials = (role: 'employee' | 'hr') => {
+    if (role === 'hr') {
       setEmail('hr@dayflow.demo');
       setPassword('hr123');
     } else {
@@ -86,7 +98,7 @@ export function LoginPage() {
             'Real database mapping to Supabase PostgreSQL',
             'Real-time attendance punch card details',
             'Leave request reviews with notifications',
-            'Spreadsheet CSV bulk upload',
+            'Enterprise Single Sign-On (SSO) Support',
           ].map(feature => (
             <div key={feature} className="flex items-center gap-3 mb-3">
               <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -112,42 +124,54 @@ export function LoginPage() {
 
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">
-              Sign in as
-            </p>
-            <div className="flex gap-2 p-1 bg-slate-100 rounded-xl">
-              {(['employee', 'hr'] as UserRole[]).map(r => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => { setRole(r); setError(''); }}
-                  className={clsx(
-                    'flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-200',
-                    role === r
-                      ? 'bg-white text-indigo-700 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                  )}
-                >
-                  {r === 'employee' ? 'Employee' : 'HR / Admin'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900">
-              {role === 'hr' ? 'HR / Admin Login' : 'Employee Login'}
+              Welcome back
             </h1>
             <p className="text-slate-500 text-sm mt-1">
-              {role === 'hr' ? 'Sign in to manage your workforce.' : 'Sign in to view your work details.'}
+              Sign in to access your DayFlow workspace.
             </p>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            <button
+              onClick={() => handleOAuthLogin('google')}
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-700 font-medium transition-colors disabled:opacity-50"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+              Sign in with Google
+            </button>
+            <button
+              onClick={() => handleOAuthLogin('azure')}
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-700 font-medium transition-colors disabled:opacity-50"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 21 21">
+                <path fill="#f25022" d="M0 0h10v10H0z"/>
+                <path fill="#7fba00" d="M11 0h10v10H11z"/>
+                <path fill="#00a4ef" d="M0 11h10v10H0z"/>
+                <path fill="#ffb900" d="M11 11h10v10H11z"/>
+              </svg>
+              Sign in with Microsoft
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-slate-200"></div>
+            <span className="text-slate-400 text-[11px] uppercase font-semibold">Or continue with email</span>
+            <div className="flex-1 h-px bg-slate-200"></div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="Email address"
               type="email"
-              placeholder={role === 'hr' ? 'hr@dayflow.demo' : 'employee@dayflow.demo'}
+              placeholder="you@company.com"
               value={email}
               onChange={e => { setEmail(e.target.value); setError(''); }}
               leftIcon={<Mail className="w-4 h-4" />}
@@ -165,13 +189,18 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
-                  className="text-slate-400"
+                  className="text-slate-400 focus-visible:outline-none focus-visible:text-indigo-600"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               }
               required
             />
+            <div className="flex justify-end">
+              <button type="button" className="text-xs text-indigo-600 hover:text-indigo-700 font-medium">
+                Forgot password?
+              </button>
+            </div>
 
             {error && (
               <div role="alert" className="flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-100 text-red-700 text-xs">
@@ -192,18 +221,23 @@ export function LoginPage() {
           </form>
 
           <div className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-100">
-            <p className="text-xs font-semibold text-amber-700 mb-2">🔑 Demo account credentials</p>
-            <div className="text-xs text-amber-700 space-y-1">
-              <p><strong>Email:</strong> {role === 'hr' ? 'hr@dayflow.demo' : 'employee@dayflow.demo'}</p>
-              <p><strong>Password:</strong> {role === 'hr' ? 'hr123' : 'employee123'}</p>
+            <p className="text-xs font-semibold text-amber-700 mb-2">🔑 Demo Testing</p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => fillDemoCredentials('employee')}
+                className="flex-1 py-1.5 bg-white border border-amber-200 text-amber-700 rounded text-xs font-medium hover:bg-amber-100 transition-colors"
+              >
+                Employee Demo
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemoCredentials('hr')}
+                className="flex-1 py-1.5 bg-white border border-amber-200 text-amber-700 rounded text-xs font-medium hover:bg-amber-100 transition-colors"
+              >
+                HR Demo
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={fillDemoCredentials}
-              className="mt-2 text-xs font-medium text-amber-700 hover:text-amber-800 underline"
-            >
-              Fill credentials →
-            </button>
           </div>
         </div>
       </div>
