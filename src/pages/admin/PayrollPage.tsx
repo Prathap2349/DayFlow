@@ -1,6 +1,6 @@
 // src/pages/admin/PayrollPage.tsx
 import { useState, useEffect } from 'react';
-import { DollarSign, Edit, Search, X } from 'lucide-react';
+import { DollarSign, Edit, Search, X, Download } from 'lucide-react';
 import { Card, CardHeader } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -8,6 +8,7 @@ import { Avatar } from '../../components/ui/Avatar';
 import { StatCard } from '../../components/shared/StatCard';
 import { employeeService } from '../../services/employeeService';
 import { payrollService } from '../../services/payrollService';
+import { generatePayslipPDF } from '../../utils/pdfGenerator';
 import type { Employee } from '../../types/employee';
 import toast from 'react-hot-toast';
 
@@ -36,6 +37,35 @@ export function AdminPayrollPage() {
     setAllowances(emp.allowances || 25000);
     setDeductions(emp.deductions || 8000);
     setModalOpen(true);
+  };
+
+  const handleDownloadPayslip = (emp: Employee) => {
+    const basic = emp.basicSalary || 65000;
+    const allow = emp.allowances || 25000;
+    const ded = emp.deductions || 8000;
+    const net = basic + allow - ded;
+
+    const today = new Date();
+    const monthName = today.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    try {
+      generatePayslipPDF({
+        id: `PAY-${emp.employeeId}`,
+        employeeId: emp.employeeId,
+        employeeName: emp.name,
+        month: monthName,
+        payPeriod: `01 - ${new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()} ${today.toLocaleString('default', { month: 'short' })}`,
+        basicSalary: basic,
+        allowances: allow,
+        deductions: ded,
+        netSalary: net,
+        paymentDate: new Date().toISOString().split('T')[0],
+        status: 'Paid',
+      });
+      toast.success(`Payslip PDF generated for ${emp.name}!`);
+    } catch (err) {
+      toast.error('Failed generating payslip PDF');
+    }
   };
 
   const handleSaveSalary = async (e: React.FormEvent) => {
@@ -148,7 +178,15 @@ export function AdminPayrollPage() {
                     <td className="px-4 py-3.5 text-slate-700">₹{allow.toLocaleString()}</td>
                     <td className="px-4 py-3.5 text-red-600">-₹{ded.toLocaleString()}</td>
                     <td className="px-4 py-3.5 font-bold text-emerald-700">₹{net.toLocaleString()}</td>
-                    <td className="px-5 py-3.5 text-right">
+                    <td className="px-5 py-3.5 text-right flex items-center justify-end gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        leftIcon={<Download className="w-3.5 h-3.5" />}
+                        onClick={() => handleDownloadPayslip(emp)}
+                      >
+                        PDF
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"
